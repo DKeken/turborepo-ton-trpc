@@ -8,7 +8,7 @@ import type {
 import { setCookie, deleteCookie } from "cookies-next";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { isClientSide, isServerSide } from "../lib/utils";
+import { isServerSide } from "../lib/utils";
 
 interface AuthState {
 	// Authentication State
@@ -86,43 +86,64 @@ export const useAuthStore = create<AuthState>()(
 						console.log(`${logPrefix} No wallet found, resetting state`);
 						get().reset();
 						deleteCookie("accessToken");
-						set({ isAuthenticated: false, isLoading: false });
+						set({
+							isAuthenticated: false,
+							isLoading: false,
+							accountInfo: null,
+						});
 						return;
 					}
 
-					if (
-						wallet.connectItems?.tonProof &&
-						"proof" in wallet.connectItems.tonProof
-					) {
-						console.log(`${logPrefix} Found TON proof, checking...`);
-						await get().checkProof(
-							wallet.connectItems.tonProof.proof,
-							wallet.account,
-						);
-					}
+					try {
+						// First check if we have a valid token and account info
+						const { accessToken } = get();
+						if (accessToken) {
+							try {
+								const accountInfo = await get().getAccountInfo();
+								if (accountInfo) {
+									console.log(`${logPrefix} Existing token is valid`);
+									set({
+										isAuthenticated: true,
+										isLoading: false,
+										accountInfo,
+									});
+									return;
+								}
+							} catch (error) {
+								console.log(`${logPrefix} Existing token is invalid:`, error);
+								deleteCookie("accessToken");
+							}
+						}
 
-					const { accessToken } = get();
-					console.log(
-						`${logPrefix} Current access token status:`,
-						!!accessToken,
-					);
-
-					if (!accessToken) {
-						console.log(`${logPrefix} No access token, disconnecting wallet`);
+						// If no valid token, check for proof
+						if (
+							wallet.connectItems?.tonProof &&
+							"proof" in wallet.connectItems.tonProof
+						) {
+							console.log(`${logPrefix} Found TON proof, checking...`);
+							await get().checkProof(
+								wallet.connectItems.tonProof.proof,
+								wallet.account,
+							);
+						} else {
+							console.log(`${logPrefix} No proof found, disconnecting wallet`);
+							tonConnectUI.disconnect();
+							set({
+								isAuthenticated: false,
+								isLoading: false,
+								accountInfo: null,
+							});
+						}
+					} catch (error) {
+						console.error(`${logPrefix} Wallet status change failed:`, error);
 						tonConnectUI.disconnect();
 						deleteCookie("accessToken");
-						set({ isAuthenticated: false, isLoading: false });
-						return;
+						set({
+							isAuthenticated: false,
+							isLoading: false,
+							accountInfo: null,
+						});
 					}
-
-					console.log(
-						`${logPrefix} Setting access token cookie and completing auth`,
-					);
-					setCookie("accessToken", accessToken, {
-						maxAge: 60 * 60 * 24 * 7, // 7 days
-						path: "/",
-					});
-					set({ isAuthenticated: true, isLoading: false });
 				},
 
 				generatePayload: async () => {
@@ -194,14 +215,29 @@ export const useAuthStore = create<AuthState>()(
 						console.log(`${logPrefix} Received response:`, data);
 
 						if (data?.token) {
-							console.log(`${logPrefix} Token received, setting access token`);
+							console.log(`${logPrefix} Token received, setting auth state`);
 							set({ accessToken: data.token });
 
-							if (isClientSide()) {
-								console.log(
-									`${logPrefix} Client side detected, reloading page`,
+							// Immediately try to get account info and set authenticated state
+							try {
+								const accountInfo = await get().getAccountInfo();
+								if (accountInfo) {
+									setCookie("accessToken", data.token, {
+										maxAge: 60 * 60 * 24 * 7, // 7 days
+										path: "/",
+									});
+									set({
+										isAuthenticated: true,
+										isLoading: false,
+										accountInfo,
+									});
+								}
+							} catch (error) {
+								console.error(
+									`${logPrefix} Failed to get initial account info:`,
+									error,
 								);
-								window.location.reload();
+								get().reset();
 							}
 						} else {
 							console.log(`${logPrefix} No token in response, resetting state`);
@@ -256,6 +292,21 @@ export const useAuthStore = create<AuthState>()(
 		),
 		{
 			name: "auth-storage",
+			onRehydrateStorage: () => {
+				return (state) => {
+					if (!state || isServerSide()) return;
+
+					console.log("[Auth:Rehydrate] Rehydrating state:", state);
+
+					if (state.accessToken) {
+						console.log("[Auth:Rehydrate] Found access token, syncing cookie");
+						setCookie("accessToken", state.accessToken, {
+							maxAge: 60 * 60 * 24 * 7, // 7 days
+							path: "/",
+						});
+					}
+				};
+			},
 		},
 	),
 );

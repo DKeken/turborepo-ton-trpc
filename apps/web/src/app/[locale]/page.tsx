@@ -10,22 +10,18 @@ import type { AccountInfo } from "@app/auth-config";
 
 export default function HomePage() {
 	const t = useTranslations("HomePage");
-	const { getAccountInfo } = useAuth();
+	const { accountInfo: authAccountInfo } = useAuth();
 	const { data, isLoading, error } = trpc.users.list.useQuery({ limit: 10 });
-	const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
+	const [localAccountInfo, setLocalAccountInfo] = useState<AccountInfo | null>(
+		null,
+	);
 
 	useEffect(() => {
-		const fetchAccountInfo = async () => {
-			const info = await getAccountInfo();
-			if (info) {
-				console.log("infoinfoinfo", info);
-				setAccountInfo(info);
-			}
-		};
-		fetchAccountInfo();
-	}, [getAccountInfo]);
+		// Используем accountInfo из контекста аутентификации
+		setLocalAccountInfo(authAccountInfo);
+	}, [authAccountInfo]);
 
-	console.log("accountInfo", accountInfo);
+	console.log("accountInfo", localAccountInfo);
 
 	return (
 		<div>

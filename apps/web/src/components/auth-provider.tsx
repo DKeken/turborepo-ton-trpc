@@ -58,6 +58,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		}),
 	);
 
+	const memoizedGetAccountInfo = useCallback(() => {
+		if (!isAuthenticated) return Promise.resolve(undefined);
+		return getAccountInfo();
+	}, [isAuthenticated, getAccountInfo]);
+
 	const handleProofPayload = useCallback(async () => {
 		console.log("Handling proof payload refresh");
 
@@ -98,24 +103,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		});
 	}, [tonConnectUI, handleWalletStatusChange]);
 
-	const contextValue = useMemo(() => {
-		console.log("Creating new context value", {
+	const contextValue = useMemo(
+		() => ({
 			isAuthenticated,
 			isLoading,
 			wallet,
+			getAccountInfo: memoizedGetAccountInfo,
 			accountInfo,
-		});
-		return {
-			isAuthenticated,
-			isLoading,
-			wallet,
-			getAccountInfo: () => {
-				console.log("Getting account info for wallet:", wallet);
-				return getAccountInfo();
-			},
-			accountInfo,
-		};
-	}, [isAuthenticated, isLoading, wallet, getAccountInfo, accountInfo]);
+		}),
+		[isAuthenticated, isLoading, wallet, memoizedGetAccountInfo, accountInfo],
+	);
 
 	return (
 		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
