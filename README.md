@@ -87,6 +87,8 @@
 ├── tools/
     └── eslint-config/       # Shared ESLint configuration
 
+```
+
 ## 🚀 Getting Started
 
 ### Prerequisites
