@@ -10,5 +10,11 @@
 			"Title": "Connect Wallet",
 			"Description": "Connect your TON wallet to access all features of the application. Your wallet serves as your digital identity and secure storage."
 		}
+	},
+	"ThemeSwitcher": {
+		"ToggleTheme": "Toggle theme",
+		"Light": "Light",
+		"Dark": "Dark",
+		"System": "System"
 	}
 }

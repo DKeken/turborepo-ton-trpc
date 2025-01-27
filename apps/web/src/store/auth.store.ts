@@ -142,7 +142,7 @@ export const useAuthStore = create<AuthState>()(
 						if (data.success) {
 							const payload = data.data;
 							set({ proofPayload: payload });
-							console.log(`[Auth:GeneratePayload] Proof payload set:`, payload);
+							console.log("[Auth:GeneratePayload] Proof payload set:", payload);
 							return { tonProof: payload };
 						}
 
