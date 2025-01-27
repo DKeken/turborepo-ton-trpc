@@ -29,6 +29,7 @@
 ### Web3
 - **TON Connect v2.0.11** - TON blockchain integration
 - **@ton/ton v15.1.0** - TON SDK
+- **Blueprint** - TON Smart Contracts development framework
 
 ### DevOps & Tools
 - **Turborepo v2.3.3** - Monorepo build system
@@ -55,6 +56,7 @@
 - Web3 authentication
 - Transaction handling
 - Smart contract interaction
+- Blueprint - TON Smart Contracts development framework
 
 ### 🚀 Developer Experience
 - Hot module replacement
@@ -75,15 +77,15 @@
 .
 ├── apps/
 │   ├── web/                 # Next.js frontend (Port: 3000)
-│   └── server/             # Bun-based backend (Port: 3333)
+│   ├── server/              # Bun-based backend (Port: 3333)
+│   └── blueprint/           # TON Smart Contracts development framework              
 ├── packages/
-│   ├── database/           # Drizzle ORM + PostgreSQL
-│   ├── logger/             # Shared logging utilities
-│   ├── auth-config/        # Authentication configuration
-│   └── tonconnect/         # TON blockchain integration
-└── tools/
-    └── eslint-config/      # Shared ESLint configuration
-```
+│   ├── database/            # Drizzle ORM + PostgreSQL
+│   ├── logger/              # Shared logging utilities
+│   ├── auth-config/         # Authentication configuration
+│   └── tonconnect/          # TON blockchain integration
+├── tools/
+    └── eslint-config/       # Shared ESLint configuration
 
 ## 🚀 Getting Started
 
