@@ -84,8 +84,6 @@
 │   ├── logger/              # Shared logging utilities
 │   ├── auth-config/         # Authentication configuration
 │   └── tonconnect/          # TON blockchain integration
-├── tools/
-    └── eslint-config/       # Shared ESLint configuration
 
 ```
 
