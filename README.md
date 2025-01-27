@@ -8,39 +8,6 @@
 
 </div>
 
-<div align="center">
-  <h2>🛠️ Technology Stack</h2>
-  <h3>Core Technologies</h3>
-  <p>
-    <img src="https://img.shields.io/badge/TypeScript-97.5%25-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white&labelColor=1a1b27" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/CSS-2.0%25-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white&labelColor=1a1b27" alt="CSS" />
-    <img src="https://img.shields.io/badge/JavaScript-0.5%25-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=white&labelColor=1a1b27" alt="JavaScript" />
-  </p>
-  
-  <h3>Framework & Tools</h3>
-  <p>
-    <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white&labelColor=1a1b27" alt="Next.js" />
-    <img src="https://img.shields.io/badge/tRPC-%232596BE.svg?style=for-the-badge&logo=trpc&logoColor=white&labelColor=1a1b27" alt="tRPC" />
-    <img src="https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white&labelColor=1a1b27" alt="Bun" />
-  </p>
-  
-  <h3>Blockchain & Database</h3>
-  <p>
-    <img src="https://img.shields.io/badge/TON-0088CC?style=for-the-badge&logo=telegram&logoColor=white&labelColor=1a1b27" alt="TON" />
-    <img src="https://img.shields.io/badge/PostgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white&labelColor=1a1b27" alt="PostgreSQL" />
-    <img src="https://img.shields.io/badge/KeyDB-DC382D?style=for-the-badge&logo=redis&logoColor=white&labelColor=1a1b27" alt="KeyDB" />
-  </p>
-  
-  <h3>Frontend & DevOps</h3>
-  <p>
-    <img src="https://img.shields.io/badge/TailwindCSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white&labelColor=1a1b27" alt="TailwindCSS" />
-    <img src="https://img.shields.io/badge/Docker-%232496ED.svg?style=for-the-badge&logo=docker&logoColor=white&labelColor=1a1b27" alt="Docker" />
-    <img src="https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=white&labelColor=1a1b27" alt="pnpm" />
-  </p>
-</div>
-
-
-A **production-ready**, **high-performance** monorepo built with cutting-edge technologies:
 
 ## 🛠️ Tech Stack
 
