@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "address" text NOT NULL;

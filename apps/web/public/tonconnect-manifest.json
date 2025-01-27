@@ -1,0 +1,7 @@
+{
+	"url": "http://localhost:3000",
+	"name": "TON Connect Demo",
+	"iconUrl": "http://localhost:3000/icon.png",
+	"termsOfUseUrl": "http://localhost:3000/terms",
+	"privacyPolicyUrl": "http://localhost:3000/privacy"
+}

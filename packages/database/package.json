@@ -1,0 +1,35 @@
+{
+  "name": "@app/database",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push --force",
+    "generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "0.38.3",
+    "drizzle-zod": "^0.6.1",
+    "kysely": "0.27.5",
+    "pg": "^8.13.1",
+    "postgres": "3.4.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "drizzle-kit": "0.30.1",
+    "eslint": "9.17.0",
+    "tsup": "8.3.5",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2"
+  }
+}

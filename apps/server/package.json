@@ -1,0 +1,29 @@
+{
+	"name": "@app/server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.ts",
+	"scripts": {
+		"dev": "bun --env-file=.env --watch src/index.ts",
+		"build": "bun build src/index.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@app/auth-config": "workspace:*",
+		"@app/database": "workspace:*",
+		"@app/logger": "workspace:*",
+		"@telegram-apps/init-data-node": "^1.2.2",
+		"@tonconnect/ui": "^2.0.11",
+		"@trpc/server": "11.0.0-rc.688",
+		"ioredis": "^5.4.2",
+		"next-auth": "5.0.0-beta.25",
+		"superjson": "^2.2.2",
+		"trpc-bun-adapter": "^1.2.2",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.1.15"
+	}
+}
