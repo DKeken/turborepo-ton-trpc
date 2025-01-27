@@ -1,34 +1,6 @@
 version: '3.9'
 
 services:
-  nginx-rtmp:
-    build:
-      context: .
-    ports:
-      - "1935:1935"  # RTMP порт
-      - "8080:8080"  # HTTP для HLS и API
-    volumes:
-      - ./hls:/tmp/hls  # Директория для HLS
-      - ./logs:/var/log/nginx  # Директория для логов
-    depends_on:
-      - auth_service
-
-  auth_service:
-    image: node:18
-    working_dir: /app
-    volumes:
-      - ./auth-service:/app
-    environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/stream_db
-      REDIS_HOST: keydb
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: streamerroom_keydb_password
-    command: ["node", "auth-service.js"]
-    ports:
-      - "8081:3000"
-    depends_on:
-      - keydb
-
   db:
     image: postgres:latest
     environment:
