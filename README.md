@@ -2,32 +2,9 @@
 
 <div align="center">
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black.svg?style=flat-square)](https://nextjs.org/)
-[![tRPC](https://img.shields.io/badge/tRPC-11.0.0--rc.688-blue.svg?style=flat-square)](https://trpc.io/)
-[![Bun](https://img.shields.io/badge/Bun-1.0.0-orange.svg?style=flat-square)](https://bun.sh/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
-
 [![GitHub stars](https://img.shields.io/github/stars/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/watchers)
-
-<p align="center">
-  <a href="https://github.com/DKeken/turborepo-ton-trpc">
-    <img src="https://github-readme-stats.vercel.app/api/pin/?username=DKeken&repo=turborepo-ton-trpc&theme=dracula" alt="Repo Card" />
-  </a>
-</p>
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DKeken&layout=donut&theme=dracula&hide=html,css&langs_count=8" alt="Top Languages" />
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/github/languages/code-size/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Code Size" />
-  <img src="https://img.shields.io/github/repo-size/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Repo Size" />
-  <img src="https://img.shields.io/github/languages/count/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Languages" />
-  <img src="https://img.shields.io/github/languages/top/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Top Language" />
-</p>
 
 </div>
 
@@ -62,16 +39,6 @@
   </p>
 </div>
 
-<div align="center">
-  <h2>📊 Repository Analytics</h2>
-  <a href="https://star-history.com/#DKeken/turborepo-ton-trpc&Date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date" />
-    </picture>
-  </a>
-</div>
 
 A **production-ready**, **high-performance** monorepo built with cutting-edge technologies:
 
