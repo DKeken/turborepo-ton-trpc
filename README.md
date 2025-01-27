@@ -1,4 +1,4 @@
-# Next.js + tRPC + Web3 Monorepo
+# Next.js + tRPC + TON Monorepo
 
 A **minimal**, **high-performance** monorepo built with modern technologies:
 
@@ -7,14 +7,14 @@ A **minimal**, **high-performance** monorepo built with modern technologies:
 - **Bun** for a speedy backend runtime
 - **Drizzle** ORM + PostgreSQL
 - **KeyDB** for caching & real-time capabilities
-- **SIWE**, **RainbowKit**, and **Wagmi** for Web3 integrations
+- **TON Connect** for Web3 integrations
 
 ## Features
 
 - **Type-Safe**: Full-stack TypeScript (client & server)
 - **Scalable**: Turborepo for efficient builds and easy project organization
 - **Modern UI**: Tailwind CSS + shadcn/ui
-- **Web3-Ready**: Ethereum authentication, wallet connection, and hooks
+- **Web3-Ready**: TON wallet connection and authentication
 - **Performance**: Bun runtime + KeyDB pub/sub
 - **Docker**: Docker Compose for easy containerization
 
@@ -47,7 +47,7 @@ A **minimal**, **high-performance** monorepo built with modern technologies:
 ```bash
 .
 ├── apps/
-│   ├── web/                 # Next.js frontend (SIWE, RainbowKit, Wagmi, Tailwind)
+│   ├── web/                 # Next.js frontend
 │   └── server/              # Bun-based backend (tRPC, Drizzle, KeyDB)
 └── packages/
     └── database/            # Shared DB logic and migrations (Drizzle + PostgreSQL)
