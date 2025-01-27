@@ -2,61 +2,74 @@
 
 <div align="center">
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black.svg)](https://nextjs.org/)
-[![tRPC](https://img.shields.io/badge/tRPC-11.0.0--rc.688-blue.svg)](https://trpc.io/)
-[![Bun](https://img.shields.io/badge/Bun-1.0.0-orange.svg)](https://bun.sh/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black.svg?style=flat-square)](https://nextjs.org/)
+[![tRPC](https://img.shields.io/badge/tRPC-11.0.0--rc.688-blue.svg?style=flat-square)](https://trpc.io/)
+[![Bun](https://img.shields.io/badge/Bun-1.0.0-orange.svg?style=flat-square)](https://bun.sh/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](./LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/DKeken/turborepo-ton-trpc?style=social)](https://github.com/DKeken/turborepo-ton-trpc/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/DKeken/turborepo-ton-trpc?style=social)](https://github.com/DKeken/turborepo-ton-trpc/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/DKeken/turborepo-ton-trpc?style=social)](https://github.com/DKeken/turborepo-ton-trpc/watchers)
+[![GitHub stars](https://img.shields.io/github/stars/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/DKeken/turborepo-ton-trpc?style=for-the-badge)](https://github.com/DKeken/turborepo-ton-trpc/watchers)
 
 <p align="center">
   <a href="https://github.com/DKeken/turborepo-ton-trpc">
-    <img src="https://github-readme-stats.vercel.app/api/pin/?username=DKeken&repo=turborepo-ton-trpc&theme=radical" alt="Repo Card" />
+    <img src="https://github-readme-stats.vercel.app/api/pin/?username=DKeken&repo=turborepo-ton-trpc&theme=dracula" alt="Repo Card" />
   </a>
 </p>
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DKeken&layout=compact&theme=radical&hide=html,css&langs_count=6" alt="Top Languages" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=DKeken&layout=donut&theme=dracula&hide=html,css&langs_count=8" alt="Top Languages" />
 </p>
-
-[![Repository Activity](https://github-readme-streak-stats.herokuapp.com/?user=DKeken&theme=radical)](https://github.com/DKeken/turborepo-ton-trpc)
 
 <p align="center">
-  <img src="https://img.shields.io/github/languages/code-size/DKeken/turborepo-ton-trpc" alt="Code Size" />
-  <img src="https://img.shields.io/github/repo-size/DKeken/turborepo-ton-trpc" alt="Repo Size" />
-  <img src="https://img.shields.io/github/languages/count/DKeken/turborepo-ton-trpc" alt="Languages" />
-  <img src="https://img.shields.io/github/languages/top/DKeken/turborepo-ton-trpc" alt="Top Language" />
+  <img src="https://img.shields.io/github/languages/code-size/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Code Size" />
+  <img src="https://img.shields.io/github/repo-size/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Repo Size" />
+  <img src="https://img.shields.io/github/languages/count/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Languages" />
+  <img src="https://img.shields.io/github/languages/top/DKeken/turborepo-ton-trpc?style=for-the-badge" alt="Top Language" />
 </p>
 
 </div>
 
 <div align="center">
-  <h3>🛠️ Tech Stack & Tools</h3>
+  <h2>🛠️ Technology Stack</h2>
+  <h3>Core Technologies</h3>
   <p>
-    <img src="https://img.shields.io/badge/TypeScript-97.5%25-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/CSS-2.0%25-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS" />
-    <img src="https://img.shields.io/badge/JavaScript-0.5%25-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+    <img src="https://img.shields.io/badge/TypeScript-97.5%25-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white&labelColor=1a1b27" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/CSS-2.0%25-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white&labelColor=1a1b27" alt="CSS" />
+    <img src="https://img.shields.io/badge/JavaScript-0.5%25-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=white&labelColor=1a1b27" alt="JavaScript" />
   </p>
+  
+  <h3>Framework & Tools</h3>
   <p>
-    <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
-    <img src="https://img.shields.io/badge/tRPC-%232596BE.svg?style=for-the-badge&logo=trpc&logoColor=white" alt="tRPC" />
-    <img src="https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white" alt="Bun" />
-    <img src="https://img.shields.io/badge/TON-0088CC?style=for-the-badge&logo=telegram&logoColor=white" alt="TON" />
-    <img src="https://img.shields.io/badge/PostgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-    <img src="https://img.shields.io/badge/KeyDB-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="KeyDB" />
-    <img src="https://img.shields.io/badge/TailwindCSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
-    <img src="https://img.shields.io/badge/Docker-%232496ED.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-    <img src="https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=white" alt="pnpm" />
+    <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white&labelColor=1a1b27" alt="Next.js" />
+    <img src="https://img.shields.io/badge/tRPC-%232596BE.svg?style=for-the-badge&logo=trpc&logoColor=white&labelColor=1a1b27" alt="tRPC" />
+    <img src="https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white&labelColor=1a1b27" alt="Bun" />
+  </p>
+  
+  <h3>Blockchain & Database</h3>
+  <p>
+    <img src="https://img.shields.io/badge/TON-0088CC?style=for-the-badge&logo=telegram&logoColor=white&labelColor=1a1b27" alt="TON" />
+    <img src="https://img.shields.io/badge/PostgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white&labelColor=1a1b27" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/KeyDB-DC382D?style=for-the-badge&logo=redis&logoColor=white&labelColor=1a1b27" alt="KeyDB" />
+  </p>
+  
+  <h3>Frontend & DevOps</h3>
+  <p>
+    <img src="https://img.shields.io/badge/TailwindCSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white&labelColor=1a1b27" alt="TailwindCSS" />
+    <img src="https://img.shields.io/badge/Docker-%232496ED.svg?style=for-the-badge&logo=docker&logoColor=white&labelColor=1a1b27" alt="Docker" />
+    <img src="https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=white&labelColor=1a1b27" alt="pnpm" />
   </p>
 </div>
 
 <div align="center">
-  <h3>📊 Repository Analytics</h3>
+  <h2>📊 Repository Analytics</h2>
   <a href="https://star-history.com/#DKeken/turborepo-ton-trpc&Date">
-    <img src="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date" alt="Star History Chart" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DKeken/turborepo-ton-trpc&type=Date" />
+    </picture>
   </a>
 </div>
 
