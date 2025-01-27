@@ -2,7 +2,7 @@ import { db } from "@app/database";
 import Logger from "@app/logger";
 import type { CreateBunContextOptions } from "trpc-bun-adapter";
 import { UsersService } from "./services/users.service";
-import type { AccountInfo } from "@/lib/types";
+import type { AccountInfo } from "@app/auth-config";
 
 const logger = Logger.createLogger({ prefix: "context" });
 const usersService = UsersService.getInstance();

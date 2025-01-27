@@ -1,6 +1,6 @@
 import { db, eq, users, userSchema, type User } from "@app/database";
-import { BaseService } from "./base-services/base.service";
-import type { EventPayload } from "./base-services/types";
+import { BaseService } from "./base/base.service";
+import type { EventPayload } from "./base/types";
 import { TRPCError } from "@trpc/server";
 import { redis } from "../lib/redis";
 import type { z } from "zod";

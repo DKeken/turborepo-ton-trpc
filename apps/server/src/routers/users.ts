@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { adminProcedure, protectedProcedure, t } from "../trpc";
+import { adminProcedure, protectedProcedure, router } from "../trpc";
 import { UsersService } from "../services/users.service";
 import { userSchema } from "@app/database";
-import { paginationSchema } from "../services/base-services/schema";
+import { paginationSchema } from "../services/base/schema";
 import { createUserSchema, updateUserSchema } from "../services/users.service";
 
 const userService = UsersService.getInstance();
 
-export const usersRouter = t.router({
+export const usersRouter = router({
 	me: protectedProcedure.query(async ({ ctx }) => {
-		const address = ctx.token?.sub?.split(":")[2] || "";
+		const address = ctx.user?.address || "";
 		return userService.findByAddress(address);
 	}),
 

@@ -1,5 +1,5 @@
 import type { TonConnectUI, Wallet } from "@tonconnect/ui-react";
-import type { AccountInfo } from "@/lib/types";
+import type { AccountInfo } from "@app/auth-config";
 import type {
 	Account,
 	ConnectAdditionalRequest,

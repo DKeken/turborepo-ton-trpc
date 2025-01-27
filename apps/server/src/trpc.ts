@@ -26,6 +26,8 @@ export const t = initTRPC.context<Context>().create({
 export const createCallerFactory = t.createCallerFactory;
 export const mergeRouters = t.mergeRouters;
 
+export const router = t.router;
+
 export const baseProcedure = t.procedure.use(async ({ ctx, next, path }) => {
 	const start = performance.now();
 	const result = await next({ ctx: { ...ctx } });
@@ -35,6 +37,10 @@ export const baseProcedure = t.procedure.use(async ({ ctx, next, path }) => {
 });
 
 export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
+	if (!ctx.user) {
+		logger.warn("Unauthorized access attempt - no user context");
+		throw new TRPCError({ code: "UNAUTHORIZED" });
+	}
 	return next({ ctx: { ...ctx } });
 });
 

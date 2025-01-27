@@ -1,4 +1,4 @@
-import { BaseController } from "./base.controller";
+import { BaseController } from "./base/base.controller";
 import { TonProofService } from "../services/ton-proof.service";
 import { TonApiService } from "../services/ton-api.service";
 import {

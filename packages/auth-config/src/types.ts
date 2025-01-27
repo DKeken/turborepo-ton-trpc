@@ -1,24 +1,33 @@
-import type { DefaultSession } from "next-auth";
-
-declare module "next-auth" {
-	interface Session extends DefaultSession {
-		user: {
-			id?: string;
-			address?: string;
-		} & DefaultSession["user"];
-		accessToken: string;
-		proofPayload: string;
-	}
-
-	interface User {
-		address: string;
-		accessToken: string;
-		proofPayload: string;
-	}
-
-	interface JWT {
-		address?: string;
-		accessToken?: string;
-		proofPayload?: string;
-	}
+export interface AccountInfo {
+	account: {
+		balance: {
+			coins: string;
+		};
+		last: {
+			hash: string;
+			lt: string;
+		};
+		state: {
+			code: string;
+			data: string;
+			type: string;
+		};
+		storageStat: {
+			duePayment: null;
+			lastPaid: number;
+			used: {
+				bits: number;
+				cells: number;
+				publicCells: number;
+			};
+		};
+	};
+	block: {
+		fileHash: string;
+		rootHash: string;
+		seqno: number;
+		shard: string;
+		workchain: number;
+	};
+	address: string;
 }

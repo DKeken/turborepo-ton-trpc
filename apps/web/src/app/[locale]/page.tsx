@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth-provider";
 import { trpc } from "@/trpc";
 import { TonConnectButton } from "@app/tonconnect";
 import { useEffect, useState } from "react";
-import type { AccountInfo } from "@/lib/types";
+import type { AccountInfo } from "@app/auth-config";
 
 export default function HomePage() {
 	const t = useTranslations("HomePage");
