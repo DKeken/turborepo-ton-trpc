@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./___providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { headers } from "next/headers";
-import { authInstance } from "@/lib/auth";
 
 import "./globals.css";
 

@@ -1,0 +1,14 @@
+{
+	"HomePage": {
+		"title": "Welcome to TON Connect Demo",
+		"about": "Go to the about page",
+		"loading": "Loading users...",
+		"error": "Error: {message}"
+	},
+	"WalletGuard": {
+		"WalletConnect": {
+			"Title": "Connect Wallet",
+			"Description": "Connect your TON wallet to access all features of the application. Your wallet serves as your digital identity and secure storage."
+		}
+	}
+}

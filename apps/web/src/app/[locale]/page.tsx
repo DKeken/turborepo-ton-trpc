@@ -1,12 +1,15 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import { useAuth } from "@/components/auth-provider";
-import type { AccountInfo } from "@/lib/types";
 import { trpc } from "@/trpc";
 import { TonConnectButton } from "@app/tonconnect";
 import { useEffect, useState } from "react";
+import type { AccountInfo } from "@/lib/types";
 
-export default function UserPage() {
+export default function HomePage() {
+	const t = useTranslations("HomePage");
 	const { getAccountInfo } = useAuth();
 	const { data, isLoading, error } = trpc.users.list.useQuery({ limit: 10 });
 	const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
@@ -26,13 +29,15 @@ export default function UserPage() {
 
 	return (
 		<div>
+			<h1>{t("title")}</h1>
 			<TonConnectButton />
 			{isLoading && !error ? (
-				<p>Loading...</p>
+				<p>{t("loading")}</p>
 			) : (
 				<pre>{JSON.stringify(data, null, 2)}</pre>
 			)}
-			{error && <p>Error: {error.message}</p>}
+			{error && <p>{t("error", { message: error.message })}</p>}
+			<Link href="/about">{t("about")}</Link>
 		</div>
 	);
 }

@@ -5,166 +5,119 @@ import type React from "react";
 import {
 	createContext,
 	useContext,
-	useCallback,
 	useEffect,
+	useMemo,
+	useCallback,
 	useRef,
-	useState,
 } from "react";
-import { TonProofApi } from "../lib/ton-proof";
-import { useInterval } from "../hooks/use-interval";
-import type { AuthContextType, AccountInfo } from "@/lib/types";
-import { setCookie, deleteCookie } from "cookies-next";
+import type { AuthContextType } from "@/lib/types";
+import { useAuthStore } from "@/store/auth.store";
+import { useInterval } from "@/hooks/use-interval";
+import { useShallow } from "zustand/shallow";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
 	const context = useContext(AuthContext);
-	console.log("[useAuth] context:", context);
 	if (!context) {
-		throw new Error("useAuth должен использоваться внутри AuthProvider");
+		console.error("useAuth was called outside of AuthProvider");
+		throw new Error("useAuth must be used within AuthProvider");
 	}
 	return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
-	console.log("[AuthProvider] Initializing...");
-	const firstProofLoading = useRef<boolean>(true);
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+	console.log("AuthProvider rendering");
+
 	const wallet = useTonWallet();
 	const [tonConnectUI] = useTonConnectUI();
+	const firstProofLoadingRef = useRef<boolean>(true);
 
-	const recreateProofPayload = useCallback(async () => {
-		console.log("[recreateProofPayload] Starting...");
-		console.log(
-			"[recreateProofPayload] firstProofLoading:",
-			firstProofLoading.current,
-		);
+	const {
+		isAuthenticated,
+		isLoading,
+		accountInfo,
+		firstProofLoading,
+		refreshIntervalMs,
+		generatePayload,
+		handleWalletStatusChange,
+		getAccountInfo,
+	} = useAuthStore(
+		useShallow((state) => {
+			console.log("AuthStore state update:", state);
+			return {
+				isAuthenticated: state.isAuthenticated,
+				isLoading: state.isLoading,
+				accountInfo: state.accountInfo,
+				firstProofLoading: state.firstProofLoading,
+				refreshIntervalMs: state.refreshIntervalMs,
+				generatePayload: state.generatePayload,
+				handleWalletStatusChange: state.handleWalletStatusChange,
+				getAccountInfo: state.getAccountInfo,
+			};
+		}),
+	);
 
-		if (firstProofLoading.current) {
-			console.log("[recreateProofPayload] Setting loading state");
+	const handleProofPayload = useCallback(async () => {
+		console.log("Handling proof payload refresh");
+
+		if (firstProofLoadingRef.current) {
+			console.log("Setting loading state for initial proof");
 			tonConnectUI.setConnectRequestParameters({ state: "loading" });
-			firstProofLoading.current = false;
+			firstProofLoadingRef.current = false;
 		}
 
-		const payload = await TonProofApi.getInstance().generatePayload();
-		console.log("[recreateProofPayload] Generated payload:", payload);
+		const payload = await generatePayload();
 
 		if (payload) {
-			console.log("[recreateProofPayload] Setting ready state with payload");
+			console.log("Setting ready state with payload");
 			tonConnectUI.setConnectRequestParameters({
 				state: "ready",
 				value: payload,
 			});
 		} else {
-			console.log("[recreateProofPayload] No payload, setting null");
+			console.log("No payload, setting null parameters");
 			tonConnectUI.setConnectRequestParameters(null);
 		}
-	}, [tonConnectUI]);
+	}, [generatePayload, tonConnectUI]);
 
 	useEffect(() => {
-		console.log(
-			"[useEffect] Checking firstProofLoading:",
-			firstProofLoading.current,
-		);
-		if (firstProofLoading.current) {
-			void recreateProofPayload();
+		if (firstProofLoading) {
+			console.log("Initial proof payload loading");
+			void handleProofPayload();
 		}
-	}, [recreateProofPayload]);
+	}, [firstProofLoading, handleProofPayload]);
 
-	useInterval(
-		recreateProofPayload,
-		TonProofApi.getInstance().getRefreshIntervalMs(),
-	);
+	useInterval(handleProofPayload, refreshIntervalMs);
 
 	useEffect(() => {
-		console.log("[statusChange] Setting up status change listener");
-
-		return tonConnectUI.onStatusChange(async (w) => {
-			console.log("[statusChange] Wallet status changed:", w);
-			setIsLoading(true);
-
-			if (!w) {
-				console.log("[statusChange] No wallet, resetting");
-				TonProofApi.getInstance().reset();
-				deleteCookie("accessToken");
-				setIsAuthenticated(false);
-				setIsLoading(false);
-				return;
-			}
-
-			console.log(
-				"[statusChange] Checking tonProof items:",
-				w.connectItems?.tonProof,
-			);
-			if (w.connectItems?.tonProof && "proof" in w.connectItems.tonProof) {
-				console.log("[statusChange] Checking proof");
-				await TonProofApi.getInstance().checkProof(
-					w.connectItems.tonProof.proof,
-					w.account,
-				);
-			}
-
-			const accessToken = TonProofApi.getInstance().getAccessToken();
-			console.log(
-				"[statusChange] Access token:",
-				accessToken ? "exists" : "missing",
-			);
-
-			if (!accessToken) {
-				console.log("[statusChange] No access token, disconnecting");
-				tonConnectUI.disconnect();
-				deleteCookie("accessToken");
-				setIsAuthenticated(false);
-				setIsLoading(false);
-				return;
-			}
-
-			console.log("[statusChange] Authentication successful");
-			setCookie("accessToken", accessToken, {
-				maxAge: 60 * 60 * 24 * 7, // 7 days
-				path: "/",
-			});
-			setIsAuthenticated(true);
-			setIsLoading(false);
+		console.log("Setting up wallet status change listener");
+		return tonConnectUI.onStatusChange((w) => {
+			console.log("Wallet status changed:", w);
+			void handleWalletStatusChange(w, tonConnectUI);
 		});
-	}, [tonConnectUI]);
+	}, [tonConnectUI, handleWalletStatusChange]);
 
-	const getAccountInfo = useCallback(async () => {
-		console.log("[getAccountInfo] Starting with wallet:", wallet);
-		if (!wallet) return;
-
-		const info = await TonProofApi.getInstance().getAccountInfo();
-		console.log("[getAccountInfo] Received info:", info);
-
-		if (info && "account" in info && "block" in info) {
-			console.log("[getAccountInfo] Valid account info received");
-			const accountInfo = info as AccountInfo;
-			setAccountInfo(accountInfo);
-			return accountInfo;
-		}
-	}, [wallet]);
-
-	console.log("[AuthProvider] Current state:", {
-		isAuthenticated,
-		isLoading,
-		accountInfo,
-	});
+	const contextValue = useMemo(() => {
+		console.log("Creating new context value", {
+			isAuthenticated,
+			isLoading,
+			wallet,
+			accountInfo,
+		});
+		return {
+			isAuthenticated,
+			isLoading,
+			wallet,
+			getAccountInfo: () => {
+				console.log("Getting account info for wallet:", wallet);
+				return getAccountInfo();
+			},
+			accountInfo,
+		};
+	}, [isAuthenticated, isLoading, wallet, getAccountInfo, accountInfo]);
 
 	return (
-		<AuthContext.Provider
-			value={{
-				isAuthenticated,
-				isLoading,
-				wallet,
-				getAccountInfo,
-				accountInfo,
-			}}
-		>
-			{children}
-		</AuthContext.Provider>
+		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 	);
 };
