@@ -14,6 +14,8 @@
 		"@app/auth-config": "workspace:*",
 		"@app/database": "workspace:*",
 		"@app/logger": "workspace:*",
+		"@app/typescript-config": "workspace:*",
+		"@app/eslint-config": "workspace:*",
 		"@telegram-apps/init-data-node": "^1.2.2",
 		"@tonconnect/ui": "^2.0.11",
 		"@trpc/server": "11.0.0-rc.688",

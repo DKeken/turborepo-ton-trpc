@@ -1,0 +1,20 @@
+{
+  "name": "@app/playwright",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "lint": "eslint . --fix",
+    "format": "prettier --write \"./src/**/*.{ts,tsx,js,jsx,json}\"",
+    "test": "playwright test",
+    "show-report": "playwright show-report",
+    "test:dev": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@app/eslint-config": "workspace:*",
+    "@playwright/test": "^1.50.1",
+    "@types/node": "^22.10.7"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
