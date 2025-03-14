@@ -143,6 +143,32 @@ bun lint     # Run ESLint
 bun format   # Run Prettier
 ```
 
+## 🔧 Environment Variables
+
+This project uses a single `.env` file in the root directory to manage all environment variables for both frontend and backend services.
+
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Update the variables in `.env` as needed:
+
+### Database Configuration
+- `DATABASE_URL`: PostgreSQL connection string
+
+### Redis Configuration
+- `REDIS_URL`: Redis/KeyDB connection URL
+- `REDIS_PASSWORD`: Redis/KeyDB password
+
+### TON Configuration
+- `NEXT_PUBLIC_TONCONNECT_MANIFEST_URL`: TON Connect manifest URL
+
+### Next.js Configuration
+- `NEXT_PUBLIC_API_URL`: API base URL
+
+For development, the default values in `.env.example` should work out of the box with the provided Docker setup.
+
 ## 👥 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

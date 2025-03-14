@@ -1,0 +1,16 @@
+{
+  "app": {
+    "title": "TON tRPC App",
+    "description": "A modern, type-safe, and scalable monorepo template"
+  },
+  "common": {
+    "connect": "Connect Wallet",
+    "disconnect": "Disconnect"
+  },
+  "WalletGuard": {
+    "WalletConnect": {
+      "Title": "Connect Wallet",
+      "Description": "Please connect your TON wallet to continue"
+    }
+  }
+} 

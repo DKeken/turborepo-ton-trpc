@@ -6,13 +6,13 @@ import { AuthProvider } from "@/components/auth-provider";
 import { TonConnectUIProvider } from "@app/tonconnect";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
-import { useLocale } from "next-intl";
 import { useEffect } from "react";
 import { isClientSide } from "@/lib/utils";
 
 interface ProvidersProps {
 	children: React.ReactNode;
 	cookies: string | null;
+	locale: string;
 }
 
 const TonConnectUIProviderNoSSR = dynamic(
@@ -27,9 +27,7 @@ const TonConnectUIProviderNoSSR = dynamic(
 	},
 );
 
-export function Providers({ children, cookies }: ProvidersProps) {
-	const locale = useLocale();
-
+export function Providers({ children, cookies, locale }: ProvidersProps) {
 	useEffect(() => {
 		const currentLocale = localStorage.getItem("locale");
 
@@ -41,10 +39,25 @@ export function Providers({ children, cookies }: ProvidersProps) {
 		}
 	}, [locale]);
 
+	// Get base URL, ensuring it has protocol and no trailing slash
+	const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+	const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+
+	// Get manifest URL, ensuring it's a full URL
+	const manifestPath = '/tonconnect-manifest.json';
+	const manifestUrl = `${normalizedBaseUrl}${manifestPath}`;
+
 	return (
 		<TonConnectUIProviderNoSSR
-			manifestUrl={process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL}
+			manifestUrl={manifestUrl}
 			language={locale as "ru" | "en"}
+			restoreConnection={true}
+			uiPreferences={{
+				theme: 'SYSTEM'
+			}}
+			actionsConfiguration={{
+				twaReturnUrl: normalizedBaseUrl as `${string}://${string}`
+			}}
 		>
 			<AuthProvider>
 				<TrpcProvider cookies={cookies}>

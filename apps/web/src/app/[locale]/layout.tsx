@@ -3,6 +3,8 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { WalletGuard } from "@/components/wallet-guard";
+import { Providers } from "../___providers";
+import { cookies } from "next/headers";
 
 export default async function LocaleLayout({
 	children,
@@ -11,17 +13,25 @@ export default async function LocaleLayout({
 	children: React.ReactNode;
 	params: { locale: string };
 }) {
-	const { locale } = await params;
-
+	// Get and validate locale
+	const locale = params.locale;
+	
 	if (!routing.locales.includes(locale as "en" | "ru")) {
 		notFound();
 	}
 
+	// Get messages
 	const messages = await getMessages();
 
+	// Get cookies string
+	const cookieStore = cookies();
+	const cookiesStr = cookieStore.toString();
+
 	return (
-		<NextIntlClientProvider messages={messages}>
-			<WalletGuard>{children}</WalletGuard>
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			<Providers cookies={cookiesStr} locale={locale}>
+				<WalletGuard>{children}</WalletGuard>
+			</Providers>
 		</NextIntlClientProvider>
 	);
 }

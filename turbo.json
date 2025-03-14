@@ -1,5 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "REDIS_PASSWORD",
+    "NEXT_PUBLIC_*"
+  ],
   "ui": "stream",
   "tasks": {
     "build": {
