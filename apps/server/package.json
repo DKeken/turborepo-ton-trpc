@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.ts",
 	"scripts": {
-		"dev": "bun --env-file=.env --watch src/index.ts",
+		"dev": "bun --env-file=../../.env --watch src/index.ts",
 		"build": "bun build src/index.ts"
 	},
 	"keywords": [],
