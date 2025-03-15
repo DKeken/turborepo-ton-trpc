@@ -1,4 +1,4 @@
-# 🚀 Next.js + Nest.js + tRPC + TON Monorepo
+# 🚀 Next.js + tRPC + TON Monorepo
 
 <div align="center">
 
@@ -8,7 +8,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Nest.js](https://img.shields.io/badge/Nest.js-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![TON](https://img.shields.io/badge/TON-0088CC?style=for-the-badge&logo=telegram&logoColor=white)](https://ton.org/)
 
 </div>

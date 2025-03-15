@@ -39,24 +39,16 @@ export function Providers({ children, cookies, locale }: ProvidersProps) {
 		}
 	}, [locale]);
 
-	// Get base URL, ensuring it has protocol and no trailing slash
-	const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-	const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
-
-	// Get manifest URL, ensuring it's a full URL
-	const manifestPath = '/tonconnect-manifest.json';
-	const manifestUrl = `${normalizedBaseUrl}${manifestPath}`;
-
 	return (
 		<TonConnectUIProviderNoSSR
-			manifestUrl={manifestUrl}
+			manifestUrl={window.location.origin + "/tonconnect-manifest.json"}
 			language={locale as "ru" | "en"}
 			restoreConnection={true}
 			uiPreferences={{
 				theme: 'SYSTEM'
 			}}
 			actionsConfiguration={{
-				twaReturnUrl: normalizedBaseUrl as `${string}://${string}`
+				twaReturnUrl: window.location.origin as `${string}://${string}`
 			}}
 		>
 			<AuthProvider>

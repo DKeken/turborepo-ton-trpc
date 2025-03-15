@@ -3,7 +3,10 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

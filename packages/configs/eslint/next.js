@@ -58,6 +58,7 @@ export const config = [
         },
       ],
       "@typescript-eslint/no-import-type-side-effects": "error",
+      "no-console": "off",
     },
   },
   {

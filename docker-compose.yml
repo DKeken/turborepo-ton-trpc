@@ -19,6 +19,33 @@ services:
       - "6379:6379"
     volumes:
       - keydb_data:/data
+      
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/dockerfile
+    depends_on:
+      - db
+      - keydb
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/stream_db
+      - KEYDB_URL=redis://:streamerroom_keydb_password@keydb:6379
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/server:/app
+      
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
 volumes:
   db_data:

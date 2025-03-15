@@ -1,242 +1,224 @@
-import { BaseController } from "./base/base.controller";
-import { TonProofService } from "../services/ton-proof.service";
-import { TonApiService } from "../services/ton-api.service";
+import { TonProofService } from "../services/ton/ton-proof.service";
+import { TonApiService } from "../services/ton/ton-api.service";
 import {
-	type AuthToken,
-	createAuthToken,
-	createPayloadToken,
-	decodeAuthToken,
-	verifyToken,
+  type AuthToken,
+  createAuthToken,
+  createPayloadToken,
+  decodeAuthToken,
+  verifyToken,
 } from "../lib/jwt";
-import Logger from "@app/logger";
-import { z } from "zod";
-import { CHAIN } from "@tonconnect/ui";
 import { Address } from "@ton/ton";
+import { withRetry } from "../utils/retry";
+import { Controller } from "./controller";
+import { Observable, catchError, from, map, of, switchMap } from "rxjs";
+import { ApiError } from "../errors/api-error";
+import { TYPES } from "../__di/types";
+import {
+  CheckProofRequestDto,
+  CheckProofRequestSchema,
+  CheckProofResponseDto,
+  GeneratePayloadResponseDto,
+  AccountInfoResponseDto,
+  createSuccessResponse,
+} from "../dto/ton.dto";
+import { ApiResponse } from "./_types";
+import { inject, injectable } from "inversify";
+import Logger from "@app/logger";
 
-const logger = Logger.createLogger({ prefix: "TonController" });
+// Define the account info structure based on TonApiService response
+interface TonAccountInfo {
+  account: {
+    balance: {
+      coins: string;
+      currencies: Record<string, string>;
+    };
+    state: {
+      type: string;
+      data?: string | null;
+      code?: string | null;
+    };
+  };
+  block: {
+    seqno: number;
+    shard: string;
+    rootHash: string;
+    fileHash: string;
+  };
+}
 
-const checkProofSchema = z
-	.object({
-		address: z.string(),
-		network: z.nativeEnum(CHAIN),
-		public_key: z.string(),
-		proof: z.object({
-			timestamp: z.number(),
-			domain: z.object({
-				lengthBytes: z.number(),
-				value: z.string(),
-			}),
-			signature: z.string(),
-			payload: z.string(),
-			state_init: z.string(),
-		}),
-	})
-	.strict();
+/**
+ * Controller for TON blockchain authentication
+ */
+@injectable()
+export class TonController extends Controller {
+  constructor(
+    @inject(TYPES.TON_PROOF_SERVICE)
+    private readonly tonProofService: TonProofService
+  ) {
+    // Create a controller-specific logger
+    super(Logger.createLogger({ prefix: "TonController" }));
+    this.setupRoutes();
+    this.setupMiddlewares();
+  }
 
-export class TonController extends BaseController {
-	private readonly tonProofService: TonProofService;
-	private readonly maxRetries = 3;
-	private readonly retryDelay = 1000; // ms
+  private setupRoutes(): void {
+    // Generate payload route
+    this.registerRoute<unknown, GeneratePayloadResponseDto>({
+      path: "/auth/generate-payload",
+      method: "GET",
+      handler: (): Observable<ApiResponse<GeneratePayloadResponseDto>> => {
+        return from(
+          withRetry(() => this.tonProofService.generatePayload())
+        ).pipe(
+          switchMap((payload) => from(createPayloadToken({ payload }))),
+          map((token) => {
+            this.logger.debug("Generated auth payload token", {
+              timestamp: new Date().toISOString(),
+            });
+            return createSuccessResponse<GeneratePayloadResponseDto>({ token });
+          }),
+          catchError((error) => {
+            this.logger.error("Failed to generate auth payload", {
+              error: error instanceof Error ? error.message : String(error),
+            });
+            throw ApiError.badRequest(
+              "Failed to generate authentication payload",
+              error
+            );
+          })
+        );
+      },
+    });
 
-	constructor() {
-		super({
-			basePath: "/ton",
-			description: "TON Blockchain Authentication Controller",
-			version: "1",
-		});
+    // Check proof route
+    this.registerRoute<CheckProofRequestDto, CheckProofResponseDto>({
+      path: "/auth/check-proof",
+      method: "POST",
+      validator: CheckProofRequestSchema,
+      handler: (
+        input: CheckProofRequestDto
+      ): Observable<ApiResponse<CheckProofResponseDto>> => {
+        return of(input).pipe(
+          switchMap((validatedInput) => {
+            const client = TonApiService.create(validatedInput.network);
+            return from(
+              withRetry(() =>
+                this.tonProofService.checkProof(
+                  validatedInput,
+                  (address: string) => client.getWalletPublicKey(address)
+                )
+              )
+            ).pipe(
+              switchMap((isValid) => {
+                if (!isValid) {
+                  throw ApiError.badRequest("Invalid proof");
+                }
+                return from(verifyToken(validatedInput.proof.payload));
+              }),
+              switchMap((isValidToken) => {
+                if (!isValidToken) {
+                  throw ApiError.badRequest("Invalid token");
+                }
+                return from(
+                  createAuthToken({
+                    address: validatedInput.address,
+                    network: validatedInput.network,
+                  })
+                );
+              }),
+              map((token) =>
+                createSuccessResponse<CheckProofResponseDto>({ token })
+              ),
+              catchError((error) => {
+                this.logger.error("Failed to check proof", {
+                  error: error instanceof Error ? error.message : String(error),
+                });
+                throw ApiError.fromError(error);
+              })
+            );
+          })
+        );
+      },
+    });
 
-		this.tonProofService = new TonProofService();
-		this.setupRoutes();
-		this.setupMiddlewares();
-	}
+    // Get account info route
+    this.registerRoute<unknown, AccountInfoResponseDto>({
+      path: "/auth/get-account-info",
+      method: "GET",
+      handler: (
+        _input: unknown,
+        headers?: Record<string, string>
+      ): Observable<ApiResponse<AccountInfoResponseDto>> => {
+        return of(headers).pipe(
+          switchMap((headers) => {
+            if (!headers) {
+              throw ApiError.unauthorized("No headers provided");
+            }
 
-	private async withRetry<T>(operation: () => T): Promise<T> {
-		let lastError: Error | null = null;
+            const token = headers.authorization?.replace("Bearer ", "");
+            if (!token) {
+              throw ApiError.unauthorized("No token provided");
+            }
 
-		for (let i = 0; i < this.maxRetries; i++) {
-			try {
-				return await Promise.resolve(operation());
-			} catch (error) {
-				lastError = error instanceof Error ? error : new Error(String(error));
-				if (i < this.maxRetries - 1) {
-					await new Promise((resolve) => setTimeout(resolve, this.retryDelay));
-				}
-			}
-		}
+            return from(verifyToken(token)).pipe(
+              switchMap((isValid) => {
+                if (!isValid) {
+                  throw ApiError.unauthorized("Invalid token");
+                }
+                const payload = decodeAuthToken(token) as AuthToken;
+                if (!payload?.address || !payload?.network) {
+                  throw ApiError.unauthorized("Invalid token payload");
+                }
+                return of(payload);
+              })
+            );
+          }),
+          switchMap((payload) => {
+            const client = TonApiService.create(payload.network);
+            return from(
+              withRetry(() => client.getAccountInfo(payload.address))
+            ).pipe(
+              map((accountInfoPromise) => {
+                // Ensure we have the account info resolved
+                return from(Promise.resolve(accountInfoPromise)).pipe(
+                  map((accountInfo: TonAccountInfo) => {
+                    const result: AccountInfoResponseDto = {
+                      address: Address.parse(payload.address).toString(),
+                      account: {
+                        balance: accountInfo.account.balance,
+                        state: accountInfo.account.state,
+                      },
+                    };
+                    return createSuccessResponse<AccountInfoResponseDto>(
+                      result
+                    );
+                  })
+                );
+              }),
+              switchMap((observable) => observable)
+            );
+          }),
+          catchError((error) => {
+            this.logger.error("Failed to get account info", {
+              error: error instanceof Error ? error.message : String(error),
+            });
+            throw ApiError.fromError(error);
+          })
+        );
+      },
+    });
+  }
 
-		if (lastError) {
-			throw lastError;
-		}
-		throw new Error("Operation failed after retries");
-	}
-
-	private setupRoutes(): void {
-		this.registerRoute({
-			path: "/auth/generate-payload",
-			method: "GET",
-			handler: async () => {
-				try {
-					const payload = await this.withRetry(() =>
-						this.tonProofService.generatePayload(),
-					);
-
-					const payloadToken = await createPayloadToken({ payload });
-
-					logger.debug("Generated auth payload token", {
-						payload,
-						token: payloadToken,
-						timestamp: new Date().toISOString(),
-					});
-
-					return {
-						success: true,
-						data: payloadToken,
-					};
-				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : String(error);
-					logger.error("Failed to generate auth payload", { errorMessage });
-
-					return {
-						success: false,
-						error: {
-							code: "BAD_REQUEST",
-							message: "Failed to generate authentication payload",
-							trace: error,
-						},
-					};
-				}
-			},
-			description: "Generates authentication payload token for TON Connect",
-			tags: ["auth", "ton-connect"],
-		});
-
-		this.registerRoute({
-			path: "/auth/check-proof",
-			method: "POST",
-			validator: checkProofSchema,
-			handler: async (input) => {
-				try {
-					const client = TonApiService.create(input.network);
-					const isValid = await this.withRetry(() =>
-						this.tonProofService.checkProof(input, (address) =>
-							client.getWalletPublicKey(address),
-						),
-					);
-
-					if (!isValid) {
-						return {
-							success: false,
-							error: {
-								code: "BAD_REQUEST",
-								message: "Invalid proof",
-							},
-						};
-					}
-
-					if (!(await verifyToken(input.proof.payload))) {
-						return {
-							success: false,
-							error: {
-								code: "BAD_REQUEST",
-								message: "Invalid token",
-							},
-						};
-					}
-
-					const token = await createAuthToken({
-						address: input.address,
-						network: input.network,
-					});
-
-					return { token };
-				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : String(error);
-					logger.error("Failed to check proof", { errorMessage });
-
-					return {
-						success: false,
-						error: {
-							code: "BAD_REQUEST",
-							message: "Failed to verify proof",
-							trace: errorMessage,
-						},
-					};
-				}
-			},
-			description: "Verifies TON Connect proof and issues access token",
-			tags: ["auth", "ton-connect"],
-		});
-
-		this.registerRoute({
-			path: "/auth/get-account-info",
-			method: "GET",
-			handler: async (_, headers) => {
-				try {
-					logger.info("Getting account info");
-					const token = headers?.authorization?.replace("Bearer ", "");
-					logger.info("Token", token);
-					if (!token || !(await verifyToken(token))) {
-						logger.error("Invalid token");
-						return {
-							success: false,
-							error: {
-								code: "UNAUTHORIZED",
-								message: "Unauthorized",
-							},
-						};
-					}
-
-					const payload = decodeAuthToken(token) as AuthToken;
-					if (!payload?.address || !payload?.network) {
-						logger.error("Invalid token");
-						return {
-							success: false,
-							error: {
-								code: "UNAUTHORIZED",
-								message: "Invalid token",
-							},
-						};
-					}
-
-					const client = TonApiService.create(payload.network);
-					const accountInfo = await this.withRetry(() =>
-						client.getAccountInfo(payload.address),
-					);
-
-					logger.info("Account info", accountInfo);
-
-					return {
-						...accountInfo,
-						address: Address.parse(payload.address).toString(),
-					};
-				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : String(error);
-					logger.error("Failed to get account info", { errorMessage });
-
-					return {
-						success: false,
-						error: {
-							code: "BAD_REQUEST",
-							message: "Failed to get account info",
-							trace: errorMessage,
-						},
-					};
-				}
-			},
-			description: "Gets account info for authenticated user",
-			tags: ["auth", "ton-connect"],
-		});
-	}
-
-	private setupMiddlewares(): void {
-		this.use(async (input) => {
-			logger.debug("Request received", {
-				timestamp: new Date().toISOString(),
-				input,
-			});
-		});
-	}
+  private setupMiddlewares(): void {
+    this.use((input) => {
+      return of(void 0).pipe(
+        map(() => {
+          this.logger.debug("Request received", {
+            timestamp: new Date().toISOString(),
+            input,
+          });
+        })
+      );
+    });
+  }
 }

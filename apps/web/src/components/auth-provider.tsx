@@ -3,12 +3,12 @@
 import { useTonConnectUI, useTonWallet } from "@app/tonconnect";
 import type React from "react";
 import {
-	createContext,
-	useContext,
-	useEffect,
-	useMemo,
-	useCallback,
-	useRef,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
 } from "react";
 import type { AuthContextType } from "@/lib/types";
 import { useAuthStore } from "@/store/auth.store";
@@ -17,104 +17,149 @@ import { useShallow } from "zustand/shallow";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const useAuth = () => {
-	const context = useContext(AuthContext);
-	if (!context) {
-		console.error("useAuth was called outside of AuthProvider");
-		throw new Error("useAuth must be used within AuthProvider");
-	}
-	return context;
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	console.log("AuthProvider rendering");
+export const AuthProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement => {
+  const wallet = useTonWallet();
+  const [tonConnectUI] = useTonConnectUI();
+  const firstProofLoadingRef = useRef<boolean>(true);
+  const initialCheckDoneRef = useRef<boolean>(false);
 
-	const wallet = useTonWallet();
-	const [tonConnectUI] = useTonConnectUI();
-	const firstProofLoadingRef = useRef<boolean>(true);
+  const {
+    isAuthenticated,
+    isLoading,
+    accountInfo,
+    firstProofLoading,
+    refreshIntervalMs,
+    generatePayload,
+    handleWalletStatusChange,
+    getAccountInfo,
+    setIsAuthenticated,
+    setAccountInfo,
+    reset,
+  } = useAuthStore(
+    useShallow((state) => {
+      return {
+        isAuthenticated: state.isAuthenticated,
+        isLoading: state.isLoading,
+        accountInfo: state.accountInfo,
+        firstProofLoading: state.firstProofLoading,
+        refreshIntervalMs: state.refreshIntervalMs,
+        generatePayload: state.generatePayload,
+        handleWalletStatusChange: state.handleWalletStatusChange,
+        getAccountInfo: state.getAccountInfo,
+        setIsAuthenticated: state.setIsAuthenticated,
+        setAccountInfo: state.setAccountInfo,
+        reset: state.reset,
+      };
+    })
+  );
 
-	const {
-		isAuthenticated,
-		isLoading,
-		accountInfo,
-		firstProofLoading,
-		refreshIntervalMs,
-		generatePayload,
-		handleWalletStatusChange,
-		getAccountInfo,
-	} = useAuthStore(
-		useShallow((state) => {
-			console.log("AuthStore state update:", state);
-			return {
-				isAuthenticated: state.isAuthenticated,
-				isLoading: state.isLoading,
-				accountInfo: state.accountInfo,
-				firstProofLoading: state.firstProofLoading,
-				refreshIntervalMs: state.refreshIntervalMs,
-				generatePayload: state.generatePayload,
-				handleWalletStatusChange: state.handleWalletStatusChange,
-				getAccountInfo: state.getAccountInfo,
-			};
-		}),
-	);
+  // Check account info on mount and logout if 401 error
+  useEffect(() => {
+    if (initialCheckDoneRef.current) return;
 
-	const memoizedGetAccountInfo = useCallback(() => {
-		if (!isAuthenticated) return Promise.resolve(undefined);
-		return getAccountInfo();
-	}, [isAuthenticated, getAccountInfo]);
+    const checkInitialAuth = async () => {
+      try {
+        const info = await getAccountInfo();
+        if (!info) {
+          // If no account info, reset auth state
+          reset();
+          setIsAuthenticated(false);
+          setAccountInfo(null);
+          if (wallet) {
+            tonConnectUI.disconnect();
+          }
+        }
+      } catch (error) {
+        // If error (like 401), reset auth state
+        reset();
+        setIsAuthenticated(false);
+        setAccountInfo(null);
+        if (wallet) {
+          tonConnectUI.disconnect();
+        }
+      } finally {
+        initialCheckDoneRef.current = true;
+      }
+    };
 
-	const handleProofPayload = useCallback(async () => {
-		console.log("Handling proof payload refresh");
+    void checkInitialAuth();
+  }, [
+    getAccountInfo,
+    reset,
+    setIsAuthenticated,
+    setAccountInfo,
+    tonConnectUI,
+    wallet,
+  ]);
 
-		if (firstProofLoadingRef.current) {
-			console.log("Setting loading state for initial proof");
-			tonConnectUI.setConnectRequestParameters({ state: "loading" });
-			firstProofLoadingRef.current = false;
-		}
+  const memoizedGetAccountInfo = useCallback(() => {
+    if (!isAuthenticated) return Promise.resolve(undefined);
+    return getAccountInfo();
+  }, [isAuthenticated, getAccountInfo]);
 
-		const payload = await generatePayload();
+  const handleProofPayload = useCallback(async (): Promise<void> => {
+    if (firstProofLoadingRef.current) {
+      tonConnectUI.setConnectRequestParameters({ state: "loading" });
+      firstProofLoadingRef.current = false;
+    }
 
-		if (payload) {
-			console.log("Setting ready state with payload");
-			tonConnectUI.setConnectRequestParameters({
-				state: "ready",
-				value: payload,
-			});
-		} else {
-			console.log("No payload, setting null parameters");
-			tonConnectUI.setConnectRequestParameters(null);
-		}
-	}, [generatePayload, tonConnectUI]);
+    try {
+      const payload = await generatePayload();
 
-	useEffect(() => {
-		if (firstProofLoading) {
-			console.log("Initial proof payload loading");
-			void handleProofPayload();
-		}
-	}, [firstProofLoading, handleProofPayload]);
+      if (payload) {
+        tonConnectUI.setConnectRequestParameters({
+          state: "ready",
+          value: payload,
+        });
+      } else {
+        tonConnectUI.setConnectRequestParameters(null);
+      }
+    } catch {
+      tonConnectUI.setConnectRequestParameters(null);
+    }
+  }, [generatePayload, tonConnectUI]);
 
-	useInterval(handleProofPayload, refreshIntervalMs);
+  useEffect(() => {
+    if (firstProofLoading) {
+      void handleProofPayload();
+    }
+  }, [firstProofLoading, handleProofPayload]);
 
-	useEffect(() => {
-		console.log("Setting up wallet status change listener");
-		return tonConnectUI.onStatusChange((w) => {
-			console.log("Wallet status changed:", w);
-			void handleWalletStatusChange(w, tonConnectUI);
-		});
-	}, [tonConnectUI, handleWalletStatusChange]);
+  useInterval(handleProofPayload, refreshIntervalMs);
 
-	const contextValue = useMemo(
-		() => ({
-			isAuthenticated,
-			isLoading,
-			wallet,
-			getAccountInfo: memoizedGetAccountInfo,
-			accountInfo,
-		}),
-		[isAuthenticated, isLoading, wallet, memoizedGetAccountInfo, accountInfo],
-	);
+  // Modify the wallet status change handler to ensure generatePayload is called before checkProof
+  useEffect(() => {
+    return tonConnectUI.onStatusChange(async (w) => {
+      // Always generate a new payload before handling wallet status change
+      await generatePayload();
+      void handleWalletStatusChange(w, tonConnectUI);
+    });
+  }, [tonConnectUI, handleWalletStatusChange, generatePayload]);
 
-	return (
-		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-	);
+  const contextValue = useMemo(
+    () => ({
+      isAuthenticated,
+      isLoading,
+      wallet,
+      getAccountInfo: memoizedGetAccountInfo,
+      accountInfo,
+    }),
+    [isAuthenticated, isLoading, wallet, memoizedGetAccountInfo, accountInfo]
+  );
+
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };

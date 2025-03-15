@@ -12,24 +12,24 @@ export default async function LocaleLayout({
 }: {
 	children: React.ReactNode;
 	params: { locale: string };
-}) {
+}): Promise<React.ReactElement> {
 	// Get and validate locale
-	const locale = params.locale;
-	
-	if (!routing.locales.includes(locale as "en" | "ru")) {
+	const userLocale = (await params).locale;
+
+	if (!routing.locales.includes(userLocale as "en" | "ru")) {
 		notFound();
 	}
 
-	// Get messages
-	const messages = await getMessages();
+	// Get localization messages
+	const localizationMessages = await getMessages();
 
-	// Get cookies string
-	const cookieStore = cookies();
-	const cookiesStr = cookieStore.toString();
+	// Get cookies string - must await cookies() before using toString()
+	const cookieStore = await cookies();
+	const serializedCookies = cookieStore.toString();
 
 	return (
-		<NextIntlClientProvider locale={locale} messages={messages}>
-			<Providers cookies={cookiesStr} locale={locale}>
+		<NextIntlClientProvider locale={userLocale} messages={localizationMessages}>
+			<Providers cookies={serializedCookies} locale={userLocale}>
 				<WalletGuard>{children}</WalletGuard>
 			</Providers>
 		</NextIntlClientProvider>

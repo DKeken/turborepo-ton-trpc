@@ -1,0 +1,11 @@
+FROM imbios/bun-node:latest
+
+WORKDIR /app
+
+COPY . .
+
+RUN bun install
+
+RUN bun run build --filter=@app/server
+
+CMD ["bun", "run", "start"]

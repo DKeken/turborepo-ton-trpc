@@ -1,6 +1,7 @@
+/* eslint-disable no-var -- globalThis replacement */
 import Redis from "ioredis";
-import { z } from "zod";
 import Logger from "@app/logger";
+import { env } from "@/_config/env";
 
 const logger = Logger.createLogger({ prefix: "redis" });
 
@@ -8,28 +9,6 @@ declare global {
 	var redisClient: Redis | undefined;
 	var redisSubscriber: Redis | undefined;
 }
-
-const envSchema = z.object({
-	REDIS_URL: z
-		.string({
-			required_error: "REDIS_URL is required",
-			invalid_type_error: "REDIS_URL must be a string",
-		})
-		.url({
-			message: "REDIS_URL must be a valid URL",
-		}),
-	REDIS_PASSWORD: z
-		.string({
-			required_error: "REDIS_PASSWORD is required",
-			invalid_type_error: "REDIS_PASSWORD must be a string",
-		})
-		.min(1, "REDIS_PASSWORD cannot be empty"),
-});
-
-const env = envSchema.parse({
-	REDIS_URL: process.env.REDIS_URL,
-	REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-});
 
 // Separate instances for pub/sub and regular commands
 let redisInstance: Redis | undefined;

@@ -1,10 +1,11 @@
+import { env } from "@/_config/env";
 import type { CHAIN } from "@tonconnect/ui";
 import { decodeJwt, type JWTPayload, jwtVerify, SignJWT } from "jose";
 
 /**
  * Secret key for the token.
  */
-const JWT_SECRET_KEY = process.env.NEXTAUTH_SECRET;
+const JWT_SECRET_KEY = env.JWT_SECRET_KEY;
 
 /**
  * Payload of the token.
@@ -47,7 +48,7 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
 	try {
 		const { payload } = await jwtVerify(token, key);
 		return payload;
-	} catch (e) {
+	} catch {
 		return null;
 	}
 }
@@ -59,7 +60,7 @@ function buildDecodeToken<T extends JWTPayload>(): (token: string) => T | null {
 	return (token: string) => {
 		try {
 			return decodeJwt(token) as T;
-		} catch (e) {
+		} catch {
 			return null;
 		}
 	};
